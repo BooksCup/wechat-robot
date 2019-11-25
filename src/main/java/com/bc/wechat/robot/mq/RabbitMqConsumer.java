@@ -2,6 +2,7 @@ package com.bc.wechat.robot.mq;
 
 import com.alibaba.fastjson.JSON;
 import com.bc.wechat.robot.entity.CanalEntity;
+import com.bc.wechat.robot.entity.Message;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -30,7 +31,8 @@ public class RabbitMqConsumer {
         if (TABLE_MESSAGE.equals(canalEntity.getTable())) {
             // 新增消息
             if (INSERT.equals(canalEntity.getEventType())) {
-                logger.info("after: " + canalEntity.getAfter());
+                Message message = JSON.parseObject(canalEntity.getAfter(), Message.class);
+                logger.info("body: " + message.getMessage_body());
             }
         }
 
