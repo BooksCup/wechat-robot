@@ -7,6 +7,7 @@ import cn.jmessage.api.common.model.message.MessageBody;
 import cn.jmessage.api.common.model.message.MessagePayload;
 import cn.jmessage.api.message.MessageType;
 import com.alibaba.fastjson.JSON;
+import com.bc.wechat.robot.cons.Constant;
 import com.bc.wechat.robot.entity.Message;
 import com.bc.wechat.robot.handler.MessageHandler;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +18,11 @@ import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 文件索引消息处理类
+ *
+ * @author zhou
+ */
 @Service("fileItemMessageHandler")
 public class FileItemMessageHandler implements MessageHandler {
 
@@ -33,7 +39,7 @@ public class FileItemMessageHandler implements MessageHandler {
 
         MessageBody replyMessageBody = new MessageBody.Builder()
                 .setText(text)
-                .addExtras(new HashMap<>())
+                .addExtras(new HashMap<>(Constant.DEFAULT_HASH_MAP_CAPACITY))
                 .build();
 
         MessagePayload payload = MessagePayload.newBuilder().setVersion(1)

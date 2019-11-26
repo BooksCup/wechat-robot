@@ -5,6 +5,11 @@ import com.bc.wechat.robot.cons.Constant;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 通用工具类
+ *
+ * @author zhou
+ */
 public class CommonUtil {
     private static Map<String, String> handleTypeMap = new HashMap<>();
 
