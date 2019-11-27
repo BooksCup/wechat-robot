@@ -57,4 +57,9 @@ public class Constant {
      * 拼音
      */
     public static final String MAPPING_SUFFIX_PINYIN = "Pinyin";
+
+    public static final String MSG_TYPE_TEXT = "text";
+    public static final String MSG_TYPE_IMAGE = "image";
+    public static final String MSG_TYPE_VOICE = "voice";
+    public static final String MSG_TYPE_CUSTOM = "custom";
 }
