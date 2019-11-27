@@ -4,8 +4,11 @@ import com.alibaba.fastjson.JSON;
 import com.bc.wechat.robot.cons.Constant;
 import com.bc.wechat.robot.enums.ResponseMsg;
 import com.bc.wechat.robot.service.ElasticSearchService;
+import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import org.apache.commons.beanutils.BeanUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsRequest;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -14,6 +17,8 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Requests;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.cluster.metadata.MappingMetaData;
+import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentFactory;
@@ -387,6 +392,8 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
     // 查询
 
     /**
+     * 查询
+     *
      * @param index        索引
      * @param type         type
      * @param queryBuilder 查询
@@ -495,6 +502,17 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
         return resultList;
     }
 
+    /**
+     * 查询
+     *
+     * @param index        索引
+     * @param type         type
+     * @param queryBuilder 查询
+     * @param postFilter   过滤
+     * @param from         搜索开端
+     * @param size         搜索文档数量
+     * @return 查询出来的结果集, List<SearchHit>格式
+     */
     @Override
     public List<SearchHit> executeSearchAndGetHit(String index, String type, QueryBuilder queryBuilder,
                                                   QueryBuilder postFilter, Integer from, Integer size) {
@@ -505,6 +523,17 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
         return executeSearchAndGetHit(indexList, typeList, queryBuilder, postFilter, from, size);
     }
 
+    /**
+     * 查询
+     *
+     * @param indexList    索引
+     * @param typeList     type
+     * @param queryBuilder 查询
+     * @param postFilter   过滤
+     * @param from         搜索开端
+     * @param size         搜索文档数量
+     * @return 查询出来的结果集, List<SearchHit>格式
+     */
     @Override
     public List<SearchHit> executeSearchAndGetHit(List<String> indexList, List<String> typeList, QueryBuilder queryBuilder,
                                                   QueryBuilder postFilter, Integer from, Integer size) {
@@ -550,6 +579,27 @@ public class ElasticSearchServiceImpl implements ElasticSearchService {
             resultList.add(searchHit);
         }
         return resultList;
+    }
+
+    /**
+     * 获取某个索引下的所有type
+     *
+     * @param index 索引名
+     * @return 所有type
+     */
+    @Override
+    public List<String> getTypeList(String index) {
+        List<String> typeList = new ArrayList<>();
+        try {
+            GetMappingsResponse res = client.admin().indices().getMappings(new GetMappingsRequest().indices(index)).get();
+            ImmutableOpenMap<String, MappingMetaData> mapping = res.mappings().get(index);
+            for (ObjectObjectCursor<String, MappingMetaData> c : mapping) {
+                typeList.add(c.key);
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        return typeList;
     }
 
 }

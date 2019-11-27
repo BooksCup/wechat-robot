@@ -159,10 +159,40 @@ public interface ElasticSearchService {
     List<String> executeSearch(List<String> indexList, List<String> typeList, QueryBuilder queryBuilder,
                                QueryBuilder postFilter, Integer from, Integer size, String isHighlight);
 
+    /**
+     * 查询
+     *
+     * @param index        索引
+     * @param type         type
+     * @param queryBuilder 查询
+     * @param postFilter   过滤
+     * @param from         搜索开端
+     * @param size         搜索文档数量
+     * @return 查询出来的结果集, List<SearchHit>格式
+     */
     List<SearchHit> executeSearchAndGetHit(String index, String type, QueryBuilder queryBuilder,
                                            QueryBuilder postFilter, Integer from, Integer size);
 
-
+    /**
+     * 查询
+     *
+     * @param indexList    索引
+     * @param typeList     type
+     * @param queryBuilder 查询
+     * @param postFilter   过滤
+     * @param from         搜索开端
+     * @param size         搜索文档数量
+     * @return 查询出来的结果集, List<SearchHit>格式
+     */
     List<SearchHit> executeSearchAndGetHit(List<String> indexList, List<String> typeList, QueryBuilder queryBuilder,
                                            QueryBuilder postFilter, Integer from, Integer size);
+
+    /**
+     * 获取某个索引下的所有type
+     *
+     * @param index 索引名
+     * @return 所有type
+     */
+    List<String> getTypeList(String index);
+
 }

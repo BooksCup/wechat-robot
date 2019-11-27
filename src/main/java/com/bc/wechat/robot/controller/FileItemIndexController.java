@@ -6,9 +6,12 @@ import com.bc.wechat.robot.utils.FileUtil;
 import io.swagger.annotations.ApiOperation;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -141,5 +144,33 @@ public class FileItemIndexController {
         resultBuffer.append("fileItem清除成功, 共耗时:")
                 .append(endTimeStamp - startTimeStamp).append("ms.");
         return resultBuffer.toString();
+    }
+
+    @ApiOperation(value = "查询fileItem", notes = "查询fileItem")
+    @GetMapping(value = "")
+    public List<Map<String, Object>> queryFileItemIndex(@RequestParam(value = "searchKey", required = false) String searchKey,
+                                                        @RequestParam(value = "page", required = false) Integer page,
+                                                        @RequestParam(value = "pageSize", required = false) Integer pageSize) {
+        logger.info("===> searchKey:" + searchKey);
+
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
+
+        if (!StringUtils.isEmpty(searchKey)) {
+            //must
+            MultiMatchQueryBuilder keywordMmqb = QueryBuilders.multiMatchQuery(searchKey,
+                    "fileName", "filePath");
+            boolQuery = boolQuery.must(keywordMmqb);
+        }
+        List<String> indexList = new ArrayList<>();
+        List<String> typeList = elasticSearchService.getTypeList(Constant.ES_INDEX_FILE_ITEM);
+        indexList.add(Constant.ES_INDEX_FILE_ITEM);
+
+        List<SearchHit> searchHitList = elasticSearchService.executeSearchAndGetHit(indexList,
+                typeList, boolQuery, null, page, pageSize);
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        for (SearchHit searchHit : searchHitList) {
+            resultList.add(searchHit.getSource());
+        }
+        return resultList;
     }
 }
