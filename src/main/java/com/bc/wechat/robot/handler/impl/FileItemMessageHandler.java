@@ -64,7 +64,17 @@ public class FileItemMessageHandler implements MessageHandler {
         if (CollectionUtils.isEmpty(searchHitList)) {
             result = "not found";
         } else {
-            result = searchHitList.get(0).getSourceAsString();
+            StringBuffer resultBuffer = new StringBuffer();
+            for (SearchHit searchHit : searchHitList) {
+                resultBuffer.append(searchHit.getSource().get("filePath"))
+                        .append("\n")
+                        .append("(")
+                        .append(searchHit.getSource().get("fileSize"))
+                        .append(")")
+                        .append("\n");
+            }
+            resultBuffer.deleteCharAt(resultBuffer.length() - 1);
+            result = resultBuffer.toString();
         }
 
 
