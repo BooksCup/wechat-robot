@@ -47,18 +47,25 @@ public class FileItemMessageHandler implements MessageHandler {
         BoolQueryBuilder boolQuery = QueryBuilders.boolQuery();
 
         if (!StringUtils.isEmpty(text)) {
+            logger.info("keywords: " + text);
             //must
             MultiMatchQueryBuilder keywordMmqb = QueryBuilders.multiMatchQuery(text,
                     "fileName", "filePath");
             boolQuery = boolQuery.must(keywordMmqb);
         }
-        List<String> indexList = new ArrayList<>();
-        List<String> typeList = elasticSearchService.getTypeList(Constant.ES_INDEX_FILE_ITEM);
-        indexList.add(Constant.ES_INDEX_FILE_ITEM);
+        List<SearchHit> searchHitList;
+        try {
+            List<String> indexList = new ArrayList<>();
+            List<String> typeList = elasticSearchService.getTypeList(Constant.ES_INDEX_FILE_ITEM);
+            indexList.add(Constant.ES_INDEX_FILE_ITEM);
 
-        List<SearchHit> searchHitList = elasticSearchService.executeSearchAndGetHit(indexList,
-                typeList, boolQuery, null, 0, 10);
-
+            searchHitList = elasticSearchService.executeSearchAndGetHit(indexList,
+                    typeList, boolQuery, null, 0, 10);
+        } catch (Exception e) {
+            searchHitList = new ArrayList<>();
+            e.printStackTrace();
+            logger.error(e.getMessage());
+        }
 
         String result;
         if (CollectionUtils.isEmpty(searchHitList)) {
