@@ -75,13 +75,17 @@ public class FileItemMessageHandler implements MessageHandler {
             for (SearchHit searchHit : searchHitList) {
                 resultBuffer.append(searchHit.getSource().get("filePath"))
                         .append("\n")
-                        .append("(")
+                        .append("【")
+                        .append(searchHit.getSource().get("diskName"))
+                        .append(" | ")
                         .append(searchHit.getSource().get("fileSize"))
-                        .append(")")
+                        .append("】")
+                        .append("\n")
                         .append("\n");
             }
-            resultBuffer.deleteCharAt(resultBuffer.length() - 1);
+            resultBuffer.delete(resultBuffer.length() - 2, resultBuffer.length());
             result = resultBuffer.toString();
+            logger.info("result: " + result);
         }
 
 
